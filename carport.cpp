@@ -2,7 +2,6 @@
 #include "ui_carport.h"
 #include "parking.h"
 #include <QDebug>
-class carport;
 
 carport::carport(QWidget *parent) :
     QWidget(parent),
