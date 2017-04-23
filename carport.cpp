@@ -8,7 +8,7 @@ carport::carport(QWidget *parent) :
     ui(new Ui::carport)
 {
     ui->setupUi(this);
-//    Parking *main = Parking::TheInstance();
+
     PushBtnParking = new QPushButton();
     PushBtnParking = ui->pushButtonStatus;
 
@@ -38,7 +38,9 @@ void carport::on_pushButtonStatus_clicked()
     carPortId_carPort = ui->labelCarPortId->text().toInt();
     //显示停车界面
     qDebug()<<"jinru"<<endl;
-
+    Parking *main = Parking::TheInstance();
+//    main->carportParking(carPortId_carPort);
+    connect(this,&carport::showPageEnter,main,&Parking::carportParking);
     emit showPageEnter(carPortId_carPort);
 
 //  int cardId = ui->labelCardId->text();

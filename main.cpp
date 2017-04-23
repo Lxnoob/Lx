@@ -7,9 +7,11 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 //    Widget w;
-    Parking w;
+//    Parking w;
 //    carport w;
-    w.show();
+//   w.show();
+    Parking *p = Parking::TheInstance();
+    p->show();
 
     return a.exec();
 }

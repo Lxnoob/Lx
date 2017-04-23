@@ -2,10 +2,13 @@
 //停车场收费
 //完成功能：显示车位信息   日期：2017年4月6日
 //完成功能：入库操作      日期：2017年4月7日
+//完成功能：查询界面直接跳转到入库界面    日期：2017年4月12日
+//完成功能：出库操作                   日期：2017年4月20日
 
 /*******************************/
 #include "ui_parking.h"
 #include "parking.h"
+#include "carport.h"
 
 #include <QDebug>
 #include <QSqlQuery>
@@ -15,30 +18,33 @@
 #include <QDateTime>
 #include <QMessageBox>
 
-//static Parking* s_instance = NULL;
-//Parking *Parking::TheInstance()
-//{
-//    if(!s_instance)
-//    {
-//        s_instance = new Parking();
-//    }
-//    return s_instance;
-//}
+static Parking* s_instance = NULL;
+Parking *Parking::TheInstance()
+{
+    if(!s_instance)
+    {
+        s_instance = new Parking();
+    }
+    return s_instance;
+}
 
 Parking::Parking(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::Parking)
 {
     ui->setupUi(this);
+    this->setWindowTitle("停车场收费系统");
     ParkWidget = ui->stackedWidget;
     ui->stackedWidget->setCurrentWidget(ui->pageMain);
+    statusTime = new QLabel();
+    statusTime->setAlignment(Qt::AlignHCenter);
+    ui->statusbar->addWidget(statusTime);
+    ui->statusbar->setStyleSheet(QString("QStatusBar::item{border: 0px}"));
     ui->lineEditCardIdEnter->setValidator(new QIntValidator(1000, 10000, this));
     //用于刷新系统时间
     timer = new QTimer(this);
     timer->start(1000);
     car = new carport();
-
-
 
     initCarPortSql();//初始化数据库
 
@@ -48,7 +54,7 @@ Parking::Parking(QWidget *parent) :
     vBoxFour = NULL;
     setInit();
     connect(timer, SIGNAL(timeout()), this, SLOT(updataTime()));
-    connect(car,SIGNAL(showPageEnter(int)),this,SLOT(carportParking(int)));
+    connect(ui->pushButtonSureOut,&QPushButton::clicked,this,&Parking::outCarPort);
 }
 
 //刷新停车位界面数据
@@ -318,6 +324,7 @@ void Parking::updataTime()
     int d=dateTime.date().day();
     QString strTime=dateTime.time().toString();
     //显示时间格式为例如 年/月/日 几点几分
+    statusTime->setText(QString::number(y)+"/"+QString::number(m)+"/"+QString::number(d)+"  "+strTime);
     ui->labelSysTime->setText(QString::number(y)+"/"+QString::number(m)+"/"+QString::number(d)+"  "+strTime);
 }
 
@@ -335,13 +342,13 @@ void Parking::on_pushButtonSure_clicked()
          //匹配数据库中的数据
         if(query.value(1) == CarPortId)
         {
-            if(query.value(2) == 1)
+            if(query.value(2) == 0)
             {
                 QMessageBox::warning(this,"错误","车位已有车");
                 return;
             }           
             //处理入库事件
-            QString cmd = tr("update carPortInfo set carPort_Status = '1',Num = '%1' where  CarPort_Id = '%2'")
+            QString cmd = tr("update carPortInfo set carPort_Status = '0',Num = '%1' where  CarPort_Id = '%2'")
                             .arg(CardId).arg(CarPortId);
             query.exec(cmd);
             QMessageBox::information(this,"通知信息","停车成功");
@@ -358,12 +365,54 @@ void Parking::on_pushButton_2_clicked()
 {
     ui->stackedWidget->setCurrentWidget(ui->pageCheck);
 }
+void Parking::outCarPort()
+{
+    //获取界面上的数据
+    int CardId = ui->lineEditCardIdOut->text().toInt();
+//    int CarPortId = ui->lineEditCarPortIdEnter->text().toInt();
+    QSqlQuery query;
+    query.exec("select * from carPortInfo");
+    while(query.next())
+    {
+        //车位状态
+        if(query.value(2) == 0)
+        {
+              //匹配数据库中的数据
+            if(query.value(0) == CardId)
+            {
+                int CarPortId = query.value(1).toInt()                      ;
+                qDebug()<<"进入"<<endl;
+                //处理入库事件
+                QString cmd = tr("update carPortInfo set carPort_Status = '1',Num = '%1' where  Num = '%2'")
+                                .arg(CarPortId).arg(CardId);
+                query.exec(cmd);
+                QMessageBox::information(this,"通知信息","出库成功");
+                //刷新显示
+                setInit();
+                //跳转回查询界面
+                ui->stackedWidget->setCurrentWidget(ui->pageCheck);
+                return;
+            }
+        }
+
+    }
+     QMessageBox::information(this,"通知信息","请输入正确卡号");
+
+}
+
 
 void Parking::carportParking(int &carportId)
 {
     qDebug()<<"xiangying"<<endl;
     QString carNum = QString("%1").arg(carportId);
+    setInit();
     ui->stackedWidget->setCurrentWidget(ui->pageEnter);
+    qDebug()<<"tiaozhuan"<<endl;
     ui->lineEditCarPortIdEnter->setText(carNum);
 
+}
+
+void Parking::on_action_triggered()
+{
+    ui->stackedWidget->setCurrentWidget(ui->pageCheck);
 }

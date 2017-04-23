@@ -5,8 +5,8 @@
 #include <QSqlDatabase>//数据库
 #include <QVBoxLayout>
 #include <QStackedWidget>
-#include "carport.h"
-
+#include <QLabel>
+class carport;
 
 namespace Ui {
 class Parking;
@@ -20,7 +20,9 @@ public:
     explicit Parking(QWidget *parent = 0);
     ~Parking();
     //返回停车界面指针
-//    static Parking* TheInstance();
+    static Parking* TheInstance();
+
+    QLabel *statusTime = NULL;
 
     QStackedWidget *ParkWidget = NULL;
     /********************************************/
@@ -39,11 +41,12 @@ public:
     int setTwo();   //二区
     int setThree(); //三区
     int setFour();  //四区
+    void carportParking(int &carportNum);//响应车位界面停车
 
 signals:
 public slots:
     void updataTime();
-    void carportParking(int &carportNum);//响应车位界面停车
+
 private slots:
     void on_actionExit_triggered();
 
@@ -64,6 +67,10 @@ private slots:
     void on_pushButtonSure_clicked();
 
     void on_pushButton_2_clicked();
+
+    void outCarPort();//出库
+
+    void on_action_triggered();
 
 private:
     double mon;			//余额

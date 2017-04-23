@@ -1,6 +1,5 @@
 #ifndef CARPORT_H
 #define CARPORT_H
-
 #include <QWidget>
 #include <QPushButton>
 
@@ -16,6 +15,7 @@ public:
     explicit carport(QWidget *parent = 0);
     ~carport();
     QPushButton *PushBtnParking;
+
     //每个车位的车位号
     int carPortId_carPort;
     int setWidget(QString carPortId,QString cardId,QString carPortStatus);//设置一个界面
