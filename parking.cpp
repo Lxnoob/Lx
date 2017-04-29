@@ -103,7 +103,8 @@ int Parking::initCarPortSql()
 
     //数据库查询
     QSqlQuery *query = new QSqlQuery;
-    //数据库内容 序号 卡号 停车位编号 车位状态 车位类型 停车日期 停车时间
+    //数据库内容
+    //序号 卡号 停车位编号 车位状态 车位类型 停车日期时间
     bool createTable = query->exec("CREATE TABLE carPortInfo\
                                (Num int primary key,\
                                card_Id int unique,\
@@ -119,17 +120,81 @@ int Parking::initCarPortSql()
     {
         qDebug()<<"数据库表创建失败!"<<carPortDb.lastError().text()<<endl;
     }
-    bool insertInfo = query->exec("insert into carPortInfo values\
-                (1,1,1,1,1,'2010-07-02 17:35:00'),\
-                (2,2,2,1,1,'2010-07-02 17:35:00'),\
-                (3,3,3,1,1,'2010-07-02 17:35:00')");
-    if(insertInfo)
+    bool insertInfo1 = query->exec("insert into carPortInfo values\
+                                    (1,null,1,1,1,null),\
+                                    (2,null,2,1,1,null),\
+                                    (3,null,3,1,1,null),\
+                                    (4,null,4,1,1,null),\
+                                    (5,null,5,1,1,null),\
+                                    (6,null,6,1,1,null),\
+                                    (7,null,7,1,1,null),\
+                                    (8,null,8,1,1,null),\
+                                    (9,null,9,1,1,null),\
+                                    (10,null,10,1,1,null)");
+    if(insertInfo1)
     {
-        qDebug()<<"插入信息成功!"<<endl;
+        qDebug()<<"插入信息1成功!"<<endl;
     }else
     {
-        qDebug()<<"插入信息失败!"<<carPortDb.lastError().text()<<endl;
+        qDebug()<<"插入信息1失败!"<<carPortDb.lastError().text()<<endl;
     }
+
+//    bool insertInfo2 = query->exec("insert into carPortInfo values\
+//                                    (11,null,11,1,2,null),\
+//                                    (12,null,12,1,2,null),\
+//                                    (13,null,13,1,2,null),\
+//                                    (14,null,14,1,2,null),\
+//                                    (15,null,15,1,2,null),\
+//                                    (16,null,16,1,2,null),\
+//                                    (17,null,17,1,2,null),\
+//                                    (18,null,18,1,2,null),\
+//                                    (19,null,19,1,2,null),\
+//                                    (20,null,20,1,2,null)");
+//   if(insertInfo2)
+//   {
+//      qDebug()<<"插入信息2成功!"<<endl;
+//   }else
+//   {
+//      qDebug()<<"插入信息2失败!"<<carPortDb.lastError().text()<<endl;
+//   }
+
+//   bool insertInfo3 = query->exec("insert into carPortInfo values\
+//                                   (21,null,21,1,3,null),\
+//                                   (22,null,22,1,3,null),\
+//                                   (23,null,23,1,3,null),\
+//                                   (24,null,24,1,3,null),\
+//                                   (25,null,25,1,3,null),\
+//                                   (26,null,26,1,3,null),\
+//                                   (27,null,27,1,3,null),\
+//                                   (28,null,28,1,3,null),\
+//                                   (29,null,29,1,3,null),\
+//                                   (30,null,30,1,3,null)");
+//   if(insertInfo3)
+//   {
+//       qDebug()<<"插入信息3成功!"<<endl;
+//   }else
+//   {
+//       qDebug()<<"插入信息3失败!"<<carPortDb.lastError().text()<<endl;
+//   }
+//   bool insertInfo4 = query->exec("insert into carPortInfo values\
+//                                   (31,null,31,1,1,null),\
+//                                   (32,null,32,1,1,null),\
+//                                   (33,null,33,1,1,null),\
+//                                   (34,null,34,1,1,null),\
+//                                   (35,null,35,1,1,null),\
+//                                   (36,null,36,1,1,null),\
+//                                   (37,null,37,1,1,null),\
+//                                   (38,null,38,1,1,null),\
+//                                   (39,null,39,1,1,null),\
+//                                   (40,null,40,1,1,null)");
+//  if(insertInfo4)
+//  {
+//     qDebug()<<"插入信息4成功!"<<endl;
+//  }else
+//  {
+//     qDebug()<<"插入信息4失败!"<<carPortDb.lastError().text()<<endl;
+//  }
+
     return 0;
 }
 //设置一号区停车位

@@ -3,6 +3,8 @@
 
 #include <QWidget>
 #include <QSqlDatabase>
+#include <QtNetwork>
+#include <QTcpSocket>
 
 class Parking;
 namespace Ui {
@@ -20,6 +22,11 @@ public:
     //初始化数据库
     int IdSqlInit();
 
+    void display();
+    void ReadMsg();
+public slots:
+    //连接服务器成功
+    void connectToHostSuccess();
 private slots:
     //用户登录
     void on_pushButton_Login_clicked();
@@ -33,10 +40,13 @@ private slots:
     //注册用户
     void on_pushButton_Regist_2_clicked();
 
+
 private:
     Ui::Widget *ui;
-    Parking *paking;
+    Parking *parking = NULL;
     QSqlDatabase IdSql;
+    QTcpSocket *socket = NULL;
 };
+
 
 #endif // LOGIN_H

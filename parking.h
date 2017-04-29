@@ -6,6 +6,7 @@
 #include <QVBoxLayout>
 #include <QStackedWidget>
 #include <QLabel>
+#include <QTcpSocket>
 class carport;
 
 namespace Ui {
@@ -20,7 +21,7 @@ public:
     explicit Parking(QWidget *parent = 0);
     ~Parking();
     //返回停车界面指针
-    static Parking* TheInstance();
+    static Parking* TheInstance();//获取主界面指针
 
     QLabel *statusTime = NULL;
 
@@ -84,6 +85,8 @@ private:
     Ui::Parking *ui;
     QTimer *timer;
     QSqlDatabase carPortDb;//停车位信息数据库
+    QTcpSocket *tcpSocket;
+
     carport *car = NULL;
 
     QVBoxLayout *vBoxOne;
