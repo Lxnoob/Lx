@@ -5,7 +5,7 @@
 //完成功能：查询界面直接跳转到入库界面    日期：2017年4月12日
 //完成功能：出库操作                   日期：2017年4月20日
 
-//数据库内容 序号0 卡号1 停车位编号2 车位状态3 车位类型4 停车日期5 停车时间6
+//数据库内容 序号0 卡号1 停车位编号2 车位状态3 车位类型4 停车日期5
 
 /*******************************/
 #include "ui_parking.h"
@@ -36,13 +36,22 @@ Parking::Parking(QWidget *parent) :
 {
     ui->setupUi(this);
     this->setWindowTitle("停车场收费系统");
+    //出库界面设置部分组件不可见
+    ui->labelEnterTime->setVisible(false);//入库时间不可见
+    ui->lineEditEnterTimeOut->setVisible(false);//入库时间不可见
+    ui->labelCost->setVisible(false);//花费
+    ui->lineEditCostOut->setVisible(false);//花费
+    ui->labelYuan->setVisible(false);//单位
+
     ParkWidget = ui->stackedWidget;
     ui->stackedWidget->setCurrentWidget(ui->pageMain);
+
     statusTime = new QLabel();
     statusTime->setAlignment(Qt::AlignHCenter);
     ui->statusbar->addWidget(statusTime);
     ui->statusbar->setStyleSheet(QString("QStatusBar::item{border: 0px}"));
     ui->lineEditCardIdEnter->setValidator(new QIntValidator(1000, 10000, this));
+
     //用于刷新系统时间
     timer = new QTimer(this);
     timer->start(1000);
@@ -72,7 +81,7 @@ Parking::~Parking()
     delete ui;
 }
 
- //初始化 停车场数据库
+//初始化 停车场数据库
 int Parking::initCarPortSql()
 {
     carPortDb = QSqlDatabase::addDatabase("QSQLITE");//添加sqlite数据
@@ -92,32 +101,35 @@ int Parking::initCarPortSql()
          qDebug()<<"open database success!"<<endl;
     }
 
+    //数据库查询
     QSqlQuery *query = new QSqlQuery;
     //数据库内容 序号 卡号 停车位编号 车位状态 车位类型 停车日期 停车时间
-    bool success = query->exec("CREATE TABLE carPortInfo\
+    bool createTable = query->exec("CREATE TABLE carPortInfo\
                                (Num int primary key,\
                                card_Id int unique,\
                                carPort_Id int not null unique,\
                                carPort_Status int,\
                                carPort_Type int not null,\
-                               parking_Data int,\
-                               parking_Time int\
+                               parking_DataTime varchar(60)\
                                 )");
-    if(success)
+    if(createTable)
     {
         qDebug()<<"数据库表创建成功!"<<endl;
     }else
     {
         qDebug()<<"数据库表创建失败!"<<carPortDb.lastError().text()<<endl;
     }
-    bool su = query->exec("insert into carPortInfo values\
-                (1,1,1,1,1,20170101,121150),\
-                (2,2,2,1,1,20170101,121150),\
-                (3,3,3,1,1,20170101,121150)");
-    qDebug()<<su<<carPortDb.lastError().text()<<endl;
-//                (1,1,1,1,1,2017-01-01 12:11:50),\
-//                (2,2,2,1,1,2017-01-01 12:11:50),\
-    qDebug()<<carPortDb.lastError().text()<<endl;
+    bool insertInfo = query->exec("insert into carPortInfo values\
+                (1,1,1,1,1,'2010-07-02 17:35:00'),\
+                (2,2,2,1,1,'2010-07-02 17:35:00'),\
+                (3,3,3,1,1,'2010-07-02 17:35:00')");
+    if(insertInfo)
+    {
+        qDebug()<<"插入信息成功!"<<endl;
+    }else
+    {
+        qDebug()<<"插入信息失败!"<<carPortDb.lastError().text()<<endl;
+    }
     return 0;
 }
 //设置一号区停车位
@@ -129,20 +141,24 @@ int Parking::setOne()
         vBoxOne = NULL;      //因为布局为指针变量，释放内存后要置为安全状态
     }
 
-    vBoxOne = new QVBoxLayout(ui->scrollAreaWidgetOne);//在滚动区域新建一个布局
+    //在滚动区域新建一个布局
+    vBoxOne = new QVBoxLayout(ui->scrollAreaWidgetOne);
     for(int i = 0;i < vecOne.size();i++)
     {
         delete vecOne[i];
     }
     vecOne.clear();
+
     QSqlQuery query;
     query.exec("select * from carPortInfo");
     while(query.next())
     {
+        //如果停车位类型为1
         if(query.value(4).toInt() == 1)
         {
             carport *c = new carport;
             vecOne.append(c);
+
             c->setWidget(query.value(2).toString(),
                             query.value(1).toString(),
                             query.value(3).toString());
@@ -306,12 +322,9 @@ void Parking::on_pushButtonSure_clicked()
     int CardId = ui->lineEditCardIdEnter->text().toInt();//卡号
     int CarPortId = ui->lineEditCarPortIdEnter->text().toInt();//停车位
     QDateTime dateTime = QDateTime::currentDateTime();//时间
-    int parkingData = dateTime.date().year()*10000+dateTime.date().month()*100+dateTime.date().day();
-    int parkingTime = dateTime.time().hour()*10000+dateTime.time().minute()*100+dateTime.time().second();
+    QString parkingDataTime = dateTime.toString("yyyy-MM-dd hh:mm:ss");
 
-    qDebug()<<parkingData<<endl;
-    qDebug()<<parkingTime<<endl;
-
+    qDebug()<<parkingDataTime<<endl;
     QSqlQuery query;
     query.exec("select * from carPortInfo");
     while(query.next())
@@ -326,15 +339,19 @@ void Parking::on_pushButtonSure_clicked()
             }
             //处理入库事件
             QString cmd = tr("update carPortInfo set card_Id = '%1',\
-                            carPort_Status = '0',parking_Data = '%2',\
-                            parking_Time = '%3' where carPort_Id = '%4'")
-                            .arg(CardId).arg(parkingData).arg(parkingTime).arg(CarPortId) ;
-
-            query.exec(cmd);
-            qDebug()<<query.value(0).toInt()<<endl;
-            QMessageBox::information(this,"通知信息","停车成功");
-       }
-
+                             carPort_Status = '0',parking_DataTime= '%2' where carPort_Id= '%3'\
+                              ").arg(CardId).arg(parkingDataTime).arg(CarPortId);
+            bool enter = query.exec(cmd);
+            if(!enter)
+            {
+                qDebug()<<"入库失败！"<<query.lastError().text()<<endl;
+                QMessageBox::warning(this,"警告",tr("%1").arg(query.lastError().text()));
+                return;
+            }else
+            {
+                QMessageBox::information(this,"通知信息","停车成功");
+            }
+        }
     }
     //刷新显示
     setInit();
@@ -351,10 +368,10 @@ void Parking::outCarPort()
 {
     //获取界面上的数据 卡号 时间
     int CardId = ui->lineEditCardIdOut->text().toInt();
-//    int CarPortId = ui->lineEditCarPortIdEnter->text().toInt();
-    QDateTime dateTime = QDateTime::currentDateTime();//时间
-    int outData = dateTime.date().year()*10000+dateTime.date().month()*100+dateTime.date().day();
-    int outTime = dateTime.time().hour()*10000+dateTime.time().minute()*100+dateTime.time().second();
+    int CarPortId = ui->lineEditCarPortIdEnter->text().toInt();
+    QDateTime outDataTime = QDateTime::currentDateTime();//时间
+    QString s_outDataTime = outDataTime.toString("yyyy-MM-dd hh:mm:ss");
+
     //查询数据库
     QSqlQuery query;
     query.exec("select * from carPortInfo");
@@ -366,33 +383,48 @@ void Parking::outCarPort()
               //匹配数据库中的数据
             if(query.value(1) == CardId)
             {
-                int CarPortId = query.value(1).toInt();
-                int parkingData = query.value(5).toInt();//获取数据库中停车日期
-                int parkingTime = query.value(6).toInt();//获取数据库中停车时间
+                int CarPortId = query.value(2).toInt();
+                QString s_parkintDataTime = query.value(5).toString();
+                QDateTime parkingDataTime = QDateTime::fromString(s_parkintDataTime, "yyyy-MM-dd hh:mm:ss");;//获取数据库中停车日期
 
+                qDebug()<<s_parkintDataTime<<endl;
                 //计算停车时长
-                int durationDataY = (outData - parkingData)/10000;//年
-                int durationDataM = (outData - parkingData)/100;//月
-                int durationDataD = (outData - parkingData);//日
+                int durationSeconds = parkingDataTime.secsTo(outDataTime);
+                int parkingCost = durationSeconds/3600;//多少小时
 
-                int durationTimeH = (outTime - parkingTime)/10000;//小时
-                int durationTimeM = (outTime - parkingTime)/100;//分
-                int durationTimeS = (outTime - parkingTime);//秒
 
-                int parkingCost = durationTimeS + (durationTimeM * 60) + (durationTimeH *60 *60) +
-                        (durationDataD * 60 *60 *24) + (durationDataM *60 *60 *24 *12) + (durationDataY *60 *60 *24 *12 *365);
-                qDebug()<<parkingCost<<endl;
-                qDebug()<<"进入"<<endl;
-                //处理入库事件
-                QString cmd = tr("update carPortInfo set carPort_Status = '1',Num = '%1' where  Num = '%2'")
-                                .arg(CarPortId).arg(CardId);
-                query.exec(cmd);
-                QMessageBox::information(this,"通知信息","出库成功");
+                //显示时间格式为例如 年/月/日 几点几分
+                QMessageBox::StandardButton sureCost;
+                sureCost = QMessageBox::question(this,"结算信息", \
+                                                 "入库时间:" + s_parkintDataTime + \
+                                                 "\n消费金额:"+QString::number(parkingCost),\
+                                                 QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+                if(sureCost == QMessageBox::Yes)
+                {
 
-                //刷新显示
-                setInit();
-                //跳转回查询界面
-                ui->stackedWidget->setCurrentWidget(ui->pageCheck);
+                    //处理入库事件
+                    QString cmd = tr("update carPortInfo set carPort_Status = '1',\
+                                    card_Id = null,\
+                                    parking_DataTime = null where carPort_Id = '%1'")\
+                                    .arg(CarPortId);
+                    bool outSuccess = query.exec(cmd);
+                    if(outSuccess)
+                    {
+                        QMessageBox::information(this,"通知信息","结算成功");
+                        //刷新显示
+                        setInit();
+                        //跳转回查询界面
+                        ui->stackedWidget->setCurrentWidget(ui->pageCheck);
+
+                    }else
+                    {
+                        QMessageBox::warning(this,"警告",tr("%1").arg(query.lastError().text()));
+                        qDebug()<<"数据库错误！"<<query.lastError().text()<<endl;
+                    }
+
+                }
+
+
                 return;
             }
         }
@@ -404,13 +436,10 @@ void Parking::outCarPort()
 
 void Parking::carportParking(int &carportId)
 {
-    qDebug()<<"xiangying"<<endl;
     QString carNum = QString("%1").arg(carportId);
     setInit();
     ui->stackedWidget->setCurrentWidget(ui->pageEnter);
-    qDebug()<<"tiaozhuan"<<endl;
     ui->lineEditCarPortIdEnter->setText(carNum);
-
 }
 void Parking::on_action_triggered()
 {

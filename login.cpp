@@ -34,7 +34,7 @@ int Widget::IdSqlInit()
     //添加数据库驱动
     QSqlDatabase IdSql = QSqlDatabase::addDatabase("QSQLITE");
     //设置数据库名称
-    IdSql.setDatabaseName("UserInfo.bat");
+    IdSql.setDatabaseName("UserInfo.db");
     if(IdSql.open())
     {
         qDebug()<<"Open Idsql Success!\n";
@@ -46,11 +46,12 @@ int Widget::IdSqlInit()
 
     QSqlQuery *query = new QSqlQuery;
 
-    query->exec("CREATE TABLE userinfo("
-                "name varchar(20) primary key,"
-                "pwd varchar(20) not null);");
+    query->exec("CREATE TABLE userinfo( \
+                name varchar(20) primary key,\
+                pwd varchar(20) not null,\
+                card_ID int unique);");
     query->exec("INSERT INTO userinfo "
-                "values('liu','123');");
+                "values('liu','123',123);");
     return 0;
 }
 

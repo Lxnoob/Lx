@@ -48,6 +48,7 @@ public slots:
     void updataTime();
 
 private slots:
+
     void on_actionExit_triggered();
 
     void on_actionEnter_triggered();

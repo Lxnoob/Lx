@@ -147,8 +147,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>761</width>
-           <height>287</height>
+           <width>98</width>
+           <height>89</height>
           </rect>
          </property>
          <attribute name="label">
@@ -165,8 +165,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>741</width>
-               <height>267</height>
+               <width>98</width>
+               <height>28</height>
               </rect>
              </property>
             </widget>
@@ -179,7 +179,7 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>89</width>
+           <width>98</width>
            <height>89</height>
           </rect>
          </property>
@@ -197,8 +197,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>69</width>
-               <height>69</height>
+               <width>98</width>
+               <height>28</height>
               </rect>
              </property>
             </widget>
@@ -211,7 +211,7 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>89</width>
+           <width>98</width>
            <height>89</height>
           </rect>
          </property>
@@ -229,8 +229,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>69</width>
-               <height>69</height>
+               <width>98</width>
+               <height>28</height>
               </rect>
              </property>
             </widget>
@@ -243,7 +243,7 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>89</width>
+           <width>98</width>
            <height>89</height>
           </rect>
          </property>
@@ -261,8 +261,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>69</width>
-               <height>69</height>
+               <width>98</width>
+               <height>28</height>
               </rect>
              </property>
             </widget>
@@ -473,7 +473,7 @@
          <string>类        型：</string>
         </property>
        </widget>
-       <widget class="QLabel" name="label_6">
+       <widget class="QLabel" name="labelEnterTime">
         <property name="geometry">
          <rect>
           <x>200</x>
@@ -492,7 +492,7 @@
          <string>入库时间：</string>
         </property>
        </widget>
-       <widget class="QLabel" name="label_7">
+       <widget class="QLabel" name="labelCost">
         <property name="geometry">
          <rect>
           <x>200</x>
@@ -567,7 +567,7 @@
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_8">
+       <widget class="QLabel" name="labelYuan">
         <property name="geometry">
          <rect>
           <x>530</x>
